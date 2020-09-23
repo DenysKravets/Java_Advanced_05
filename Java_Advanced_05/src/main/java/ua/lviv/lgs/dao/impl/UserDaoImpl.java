@@ -8,6 +8,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+//import org.apache.log4j.Logger;
 
 import ua.lviv.lgs.dao.UserDao;
 import ua.lviv.lgs.domain.User;
@@ -15,17 +19,21 @@ import ua.lviv.lgs.utils.ConnectionUtils;
 
 public class UserDaoImpl implements UserDao {
 
+//	private static Logger LOGGER = Logger.getLogger(UserDaoImpl.class);
+	private static Logger LOGGER = LogManager.getLogger();
+	
 	private Connection connection;
 	private PreparedStatement preparedStatement;
 	private ResultSet resultSet;
 	
 	private String READ_ALL = "select * from user";
 	private String READ = "select * from user where id = ?";
-	private String SAVE = "insert into user(firstName, lastName, email, role)"
-			+ " values (?, ?, ?, ?)";
+	private String SAVE = "insert into user(firstName, lastName, email, role, password)"
+			+ " values (?, ?, ?, ?, ?)";
 	private String DELETE = "delete from user where id = ?";
 	private String UPDATE = "update user set"
-			+ " firstName = ?, lastName = ?, email = ?, role = ?  where id = ?";
+			+ " firstName = ?, lastName = ?, email = ?, role = ?, password = ?  where id = ?";
+	private String READ_BY_EMAIL = "select * from user where email = ?";
 	
 	public UserDaoImpl() {
 		super();
@@ -49,12 +57,13 @@ public class UserDaoImpl implements UserDao {
 				String lastName = resultSet.getString("lastName");
 				String email = resultSet.getString("email");
 				String role = resultSet.getString("role");
+				String password = resultSet.getString("password");
 				
-				users.add(new User(id, firstName, lastName, email, role));
+				users.add(new User(id, firstName, lastName, email, role, password));
 			}
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
@@ -81,12 +90,13 @@ public class UserDaoImpl implements UserDao {
 				String lastName = resultSet.getString("lastName");
 				String email = resultSet.getString("email");
 				String role = resultSet.getString("role");
+				String password = resultSet.getString("password");
 				
-				user = new User(id, firstName, lastName, email, role);
+				user = new User(id, firstName, lastName, email, role, password);
 			}
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
@@ -104,10 +114,11 @@ public class UserDaoImpl implements UserDao {
 			preparedStatement.setString(2, user.getLastName());
 			preparedStatement.setString(3, user.getEmaill());
 			preparedStatement.setString(4, user.getRole());
+			preparedStatement.setString(5, user.getPassword());
 			preparedStatement.executeUpdate();
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
@@ -124,7 +135,7 @@ public class UserDaoImpl implements UserDao {
 			preparedStatement.executeUpdate();
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
@@ -141,15 +152,50 @@ public class UserDaoImpl implements UserDao {
 			preparedStatement.setString(2, user.getLastName());
 			preparedStatement.setString(3, user.getEmaill());
 			preparedStatement.setString(4, user.getRole());
-			preparedStatement.setInt(5, user.getId());
+			preparedStatement.setString(5, user.getPassword());
+			preparedStatement.setInt(6, user.getId());
 			preparedStatement.executeUpdate();
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
 		
+	}
+	
+	@Override
+	public User readUserByEmail(String searchEmail) {
+		
+		User user = null;
+		
+		try {
+			
+			connection = ConnectionUtils.makeConnection();
+			preparedStatement = connection.prepareStatement(READ_BY_EMAIL);
+			preparedStatement.setString(1, searchEmail);
+			resultSet = preparedStatement.executeQuery();
+			
+			while(resultSet.next()) {
+				
+				Integer id = resultSet.getInt("id");
+				String firstName = resultSet.getString("firstName");
+				String lastName = resultSet.getString("lastName");
+				String email = resultSet.getString("email");
+				String role = resultSet.getString("role");
+				String password = resultSet.getString("password");
+				
+				user = new User(id, firstName, lastName, email, role, password);
+				
+			}
+			
+		} catch (SQLException e) {
+			LOGGER.error(e);
+		} finally {
+			closeConnection(connection, preparedStatement, resultSet);
+		}
+		
+		return user;
 	}
 
 	@Override
@@ -165,9 +211,10 @@ public class UserDaoImpl implements UserDao {
 				connection.close();
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 	}
+
 
 	
 

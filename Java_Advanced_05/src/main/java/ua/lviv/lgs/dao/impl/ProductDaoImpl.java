@@ -8,11 +8,19 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+//import org.apache.log4j.Logger;
+
 import ua.lviv.lgs.dao.ProductDao;
 import ua.lviv.lgs.domain.Product;
 import ua.lviv.lgs.utils.ConnectionUtils;
 
 public class ProductDaoImpl implements ProductDao {
+	
+//	private static Logger LOGGER = Logger.getLogger(UserDaoImpl.class);
+	private static Logger LOGGER = LogManager.getLogger();
 
 	private Connection connection;
 	private PreparedStatement preparedStatement;
@@ -52,7 +60,7 @@ public class ProductDaoImpl implements ProductDao {
 			}
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
@@ -83,7 +91,7 @@ public class ProductDaoImpl implements ProductDao {
 			}
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
@@ -103,7 +111,7 @@ public class ProductDaoImpl implements ProductDao {
 			preparedStatement.executeUpdate();
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
@@ -120,7 +128,7 @@ public class ProductDaoImpl implements ProductDao {
 			preparedStatement.executeUpdate();
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
@@ -140,7 +148,7 @@ public class ProductDaoImpl implements ProductDao {
 			preparedStatement.executeUpdate();
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
@@ -160,7 +168,7 @@ public class ProductDaoImpl implements ProductDao {
 				connection.close();
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 	}
 

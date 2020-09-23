@@ -9,12 +9,20 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+//import org.apache.log4j.Logger;
+
 import ua.lviv.lgs.dao.BucketDao;
 import ua.lviv.lgs.domain.Bucket;
 import ua.lviv.lgs.utils.ConnectionUtils;
 
 public class BucketDaoImpl implements BucketDao {
 
+//	private static Logger LOGGER = Logger.getLogger(UserDaoImpl.class);
+	private static Logger LOGGER = LogManager.getLogger();
+	
 	private Connection connection;
 	private PreparedStatement preparedStatement;
 	private ResultSet resultSet;
@@ -52,7 +60,7 @@ public class BucketDaoImpl implements BucketDao {
 			}
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
@@ -83,7 +91,7 @@ public class BucketDaoImpl implements BucketDao {
 			}
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
@@ -103,7 +111,7 @@ public class BucketDaoImpl implements BucketDao {
 			preparedStatement.executeUpdate();
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
@@ -120,7 +128,7 @@ public class BucketDaoImpl implements BucketDao {
 			preparedStatement.executeUpdate();
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
@@ -140,7 +148,7 @@ public class BucketDaoImpl implements BucketDao {
 			preparedStatement.executeUpdate();
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
@@ -160,7 +168,7 @@ public class BucketDaoImpl implements BucketDao {
 				connection.close();
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 	}
 
