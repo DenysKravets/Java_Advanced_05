@@ -10,7 +10,9 @@
 </head>
 <body>
 
-<h1>Welcome to the Main Page ${firstName}</h1>
+
+
+<h1>Welcome to the Main Page</h1>
 
 </body>
 </html>
