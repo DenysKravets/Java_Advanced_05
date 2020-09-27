@@ -1,0 +1,29 @@
+.extendable:focus {
+    position: absolute;
+    width: 110%;
+    top: -1rem;
+}
+
+.addProduct {
+	padding-top: 40px;
+	width: 600px;
+}
+
+#login-submit {
+	background-color: #56d15f;
+	color: #fff;
+	position: relative;
+	left: -158px;
+}
+
+label {
+	font-size: 22px;
+}
+
+#name {
+	width: 300px;
+}
+
+#price {
+	width: 175px;
+}
