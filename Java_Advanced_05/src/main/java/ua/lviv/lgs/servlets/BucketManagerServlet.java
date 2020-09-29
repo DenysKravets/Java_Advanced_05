@@ -1,6 +1,7 @@
 package ua.lviv.lgs.servlets;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -13,22 +14,23 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import ua.lviv.lgs.domain.Product;
-import ua.lviv.lgs.service.ProductService;
-import ua.lviv.lgs.service.impl.ProductServiceImpl;
+import ua.lviv.lgs.domain.Bucket;
+import ua.lviv.lgs.domain.User;
+import ua.lviv.lgs.service.BucketService;
+import ua.lviv.lgs.service.impl.BucketServiceImpl;
 
 
-@WebServlet(urlPatterns = "/productManager")
-public class ProductManagerServlet extends HttpServlet {
+@WebServlet(urlPatterns = "/bucketManager")
+public class BucketManagerServlet extends HttpServlet {
 	
 	/**
 	 * I have no idea why this is needed but whatever.
 	 */
 	private static final long serialVersionUID = 1L;
 
-	ProductService productService = new ProductServiceImpl();
+	BucketService bucketService = new BucketServiceImpl();
 
-	// to create resource (product)
+	// to create resource (bucket)
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
@@ -42,14 +44,12 @@ public class ProductManagerServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 				
-		String name = (String) object.getOrDefault("name", "");
-		String description = (String) object.getOrDefault("description", "");
-		String price = (String) object.getOrDefault("price", "");
+		Integer productId = Integer.parseInt((String) object.getOrDefault("productId", "0"));
+		Integer userId = ((User) request.getSession().getAttribute("user")).getId();
 		
-		if (!name.isEmpty() && !description.isEmpty() && !price.isEmpty()) {
-			
-			productService.save(new Product(name, description, getValidatedPrice(price)));
-			
+		
+		if (productId != null && userId != null) {
+			bucketService.save(new Bucket(productId, userId, LocalDateTime.now()));
 		}
 		
 		response.setContentType("text/plain");
@@ -57,33 +57,26 @@ public class ProductManagerServlet extends HttpServlet {
 		response.getWriter().write("Success");
 		
 	}
-	
-	private double getValidatedPrice(String price) {
-		if(price == null || price.isEmpty()) {
-			return 0;
-		}
-		return Double.parseDouble(price);
-	}
 
-	// to get resource (product)
+	// to get resource (bucket)
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		Integer id = Integer.parseInt(request.getParameter("id"));
-		
-		Product product = productService.read(id);
-		
-		request.setAttribute("id", id);
-		request.setAttribute("name", product.getName());
-		request.setAttribute("description", product.getDescription());
-		request.setAttribute("price", product.getPrice());
-		
-		request.getRequestDispatcher("/singleProduct.jsp").forward(request, response);
+//		Integer id = Integer.parseInt(request.getParameter("id"));
+//		
+//		Product product = productService.read(id);
+//		
+//		request.setAttribute("id", id);
+//		request.setAttribute("name", product.getName());
+//		request.setAttribute("description", product.getDescription());
+//		request.setAttribute("price", product.getPrice());
+//		
+//		request.getRequestDispatcher("/singleProduct.jsp").forward(request, response);
 		
 	}
 
-	// to update resource (product)
+	// to update resource (bucket)
 	@Override
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 

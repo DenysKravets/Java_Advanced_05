@@ -1,3 +1,5 @@
 
 2020-09-27 15:37:50,799 ERROR u.l.l.d.i.UserDaoImpl [http-nio-8080-exec-2] java.sql.SQLIntegrityConstraintViolationException: Duplicate entry '1' for key 'user.email'
 2020-09-27 15:38:47,586 ERROR u.l.l.d.i.UserDaoImpl [http-nio-8080-exec-6] java.sql.SQLIntegrityConstraintViolationException: Duplicate entry '1' for key 'user.email'
+2020-09-28 21:47:32,775 ERROR u.l.l.d.i.ProductDaoImpl [http-nio-8080-exec-5] com.mysql.cj.jdbc.exceptions.MysqlDataTruncation: Data truncation: Data too long for column 'description' at row 1
+2020-09-28 21:48:50,161 ERROR u.l.l.d.i.ProductDaoImpl [http-nio-8080-exec-7] com.mysql.cj.jdbc.exceptions.MysqlDataTruncation: Data truncation: Data too long for column 'description' at row 1
