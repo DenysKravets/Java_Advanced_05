@@ -49,7 +49,7 @@ public class BucketManagerServlet extends HttpServlet {
 		
 		
 		if (productId != null && userId != null) {
-			bucketService.save(new Bucket(productId, userId, LocalDateTime.now()));
+			bucketService.save(new Bucket(userId, productId, LocalDateTime.now()));
 		}
 		
 		response.setContentType("text/plain");
