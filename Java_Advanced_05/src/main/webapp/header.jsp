@@ -18,8 +18,8 @@
         <ul class="nav-menu">
           <li class="menu-active"><a href="${pageContext.request.contextPath}/mainPage.jsp">Home</a></li>
           <li><a href="${pageContext.request.contextPath}/productManagement.jsp">Product Management</a></li>
+          <li><a href="${pageContext.request.contextPath}/bucket.jsp">Bucket</a></li>
           <li><a href="" class="logout">Log-Out</a></li>
-          <li><a href=""></a></li>
           
           <li class="menu-has-children"><a href="">Drop Down</a>
             <ul>
