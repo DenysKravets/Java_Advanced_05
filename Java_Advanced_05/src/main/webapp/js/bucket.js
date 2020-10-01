@@ -33,7 +33,7 @@ $(document).ready(function(){
 					+ "<td>" + value.name + "</td>"
 					+ "<td>" + value.description + "</td>"
 					+ "<td>" + value.price + "</td>"
-					+ "<td>" + value.purchaseDate.date + "</td>"
+					+ "<td>" + value.purchaseDate.date.year + "-" + value.purchaseDate.date.month + "-" + value.purchaseDate.date.day + "</td>"
 					+ "<td><button onclick='deleteBucket(this)' class='delete' name='delete' bucketId='" + value.bucketId + "'>Delete</button></td>"
 				+ "</tr>"
 			
