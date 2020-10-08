@@ -50,13 +50,13 @@ public class BucketServlet extends HttpServlet {
 		User user = (User) request.getSession().getAttribute("user");
 		
 		bucketDtos = buckets.stream().filter(bucket -> {
-			if(bucket.getUser_id().equals(user.getId())) {
+			if(bucket.getUser().getId().equals(user.getId())) {
 				return true;
 			} else {
 				return false;
 			}
 		}).map(bucket -> {
-			Product product = productService.read(bucket.getProduct_id());
+			Product product = productService.read(bucket.getProduct().getId());
 			return new BucketDto(bucket.getId(), product.getName(), product.getDescription(), product.getPrice(), bucket.getDateOfPurchase());
 		}).collect(Collectors.toList());
 		

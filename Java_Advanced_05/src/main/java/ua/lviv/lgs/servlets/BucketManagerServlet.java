@@ -15,9 +15,12 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import ua.lviv.lgs.domain.Bucket;
+import ua.lviv.lgs.domain.Product;
 import ua.lviv.lgs.domain.User;
 import ua.lviv.lgs.service.BucketService;
+import ua.lviv.lgs.service.ProductService;
 import ua.lviv.lgs.service.impl.BucketServiceImpl;
+import ua.lviv.lgs.service.impl.ProductServiceImpl;
 
 
 @WebServlet(urlPatterns = "/bucketManager")
@@ -29,6 +32,7 @@ public class BucketManagerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	BucketService bucketService = new BucketServiceImpl();
+	ProductService productService = new ProductServiceImpl();
 
 	// to create resource (bucket)
 	@Override
@@ -45,11 +49,13 @@ public class BucketManagerServlet extends HttpServlet {
 		}
 				
 		Integer productId = Integer.parseInt((String) object.getOrDefault("productId", "0"));
-		Integer userId = ((User) request.getSession().getAttribute("user")).getId();
+		
+		Product product = productService.read(productId);
+		User user = (User) request.getSession().getAttribute("user");
 		
 		
-		if (productId != null && userId != null) {
-			bucketService.save(new Bucket(userId, productId, LocalDateTime.now()));
+		if (product != null && user != null) {
+			bucketService.save(new Bucket(user, product, LocalDateTime.now()));
 		}
 		
 		response.setContentType("text/plain");

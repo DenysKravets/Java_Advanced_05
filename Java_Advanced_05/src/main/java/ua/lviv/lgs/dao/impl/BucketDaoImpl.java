@@ -6,8 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 import ua.lviv.lgs.dao.BucketDao;
 import ua.lviv.lgs.domain.Bucket;
+import ua.lviv.lgs.shared.FactoryManager;
 import ua.lviv.lgs.utils.ConnectionUtils;
 
 public class BucketDaoImpl implements BucketDao {
@@ -37,35 +41,26 @@ public class BucketDaoImpl implements BucketDao {
 	public BucketDaoImpl() {
 		super();
 	}
+	
+	private EntityManagerFactory emf = FactoryManager.getEntityManagerFactory();
+	private EntityManager em = FactoryManager.getEntityManager();
 
 	@Override
 	public List<Bucket> readAll() {
 		
-		List<Bucket> buckets = new ArrayList<>();
+		Query query = null;
 		
 		try {
 			
-			connection = ConnectionUtils.makeConnection();
-			preparedStatement = connection.prepareStatement(READ_ALL);
-			resultSet = preparedStatement.executeQuery();
+			query = em.createQuery("select e from Bucket e");
 			
-			while(resultSet.next()) {
-				
-				Integer id = resultSet.getInt("id");
-				Integer user_id = resultSet.getInt("user_id");
-				Integer product_id = resultSet.getInt("product_id");
-				LocalDateTime dateOfPurchase = ConnectionUtils.parseToLocalDateTime(resultSet.getString("dateOfPurchase"));
-				
-				buckets.add(new Bucket(id, user_id, product_id, dateOfPurchase));
-			}
-			
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
 		
-		return buckets;
+		return query.getResultList();
 	}
 
 	@Override
@@ -75,22 +70,9 @@ public class BucketDaoImpl implements BucketDao {
 		
 		try {
 			
-			connection = ConnectionUtils.makeConnection();
-			preparedStatement = connection.prepareStatement(READ);
-			preparedStatement.setInt(1, searchId);
-			resultSet = preparedStatement.executeQuery();
+			bucket = em.find(Bucket.class, searchId);
 			
-			while(resultSet.next()) {
-				
-				Integer id = resultSet.getInt("id");
-				Integer user_id = resultSet.getInt("user_id");
-				Integer product_id = resultSet.getInt("product_id");
-				LocalDateTime dateOfPurchase = ConnectionUtils.parseToLocalDateTime(resultSet.getString("dateOfPurchase"));
-				
-				bucket = new Bucket(id, user_id, product_id, dateOfPurchase);
-			}
-			
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
@@ -103,12 +85,12 @@ public class BucketDaoImpl implements BucketDao {
 	public void save(Bucket t) {
 		
 		try {
-			connection = ConnectionUtils.makeConnection();
-			preparedStatement = connection.prepareStatement(SAVE);
-			preparedStatement.setInt(1, t.getUser_id());
-			preparedStatement.setInt(2, t.getProduct_id());
-			preparedStatement.setString(3, ConnectionUtils.parseToMsqlString(t.getDateOfPurchase()));
-			preparedStatement.executeUpdate();
+			
+			em.getTransaction().begin();
+			
+			em.persist(t);
+			
+			em.getTransaction().commit();
 			
 		} catch (Exception e) {
 			LOGGER.error(e);
@@ -122,15 +104,17 @@ public class BucketDaoImpl implements BucketDao {
 	public void delete(Integer id) {
 		
 		try {
-			connection = ConnectionUtils.makeConnection();
-			preparedStatement = connection.prepareStatement(DELETE);
-			preparedStatement.setInt(1, id);
-			preparedStatement.executeUpdate();
+			
+			em.getTransaction().begin();
+			
+			em.remove(read(id));
+			
+			em.getTransaction().commit();
 			
 		} catch (Exception e) {
 			LOGGER.error(e);
 		} finally {
-			closeConnection(connection, preparedStatement, resultSet);
+			
 		}
 		
 	}
@@ -139,13 +123,7 @@ public class BucketDaoImpl implements BucketDao {
 	public void update(Bucket t) {
 
 		try {
-			connection = ConnectionUtils.makeConnection();
-			preparedStatement = connection.prepareStatement(UPDATE);
-			preparedStatement.setInt(1, t.getUser_id());
-			preparedStatement.setInt(2, t.getProduct_id());
-			preparedStatement.setString(3, ConnectionUtils.parseToMsqlString(LocalDateTime.now()));
-			preparedStatement.setInt(4, t.getId());
-			preparedStatement.executeUpdate();
+			
 			
 		} catch (Exception e) {
 			LOGGER.error(e);

@@ -8,6 +8,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 import ua.lviv.lgs.dao.ProductDao;
 import ua.lviv.lgs.domain.Product;
+import ua.lviv.lgs.shared.FactoryManager;
 import ua.lviv.lgs.utils.ConnectionUtils;
 
 public class ProductDaoImpl implements ProductDao {
@@ -37,35 +42,26 @@ public class ProductDaoImpl implements ProductDao {
 	public ProductDaoImpl() {
 		super();
 	}
+	
+	private EntityManagerFactory emf = FactoryManager.getEntityManagerFactory();
+	private EntityManager em = FactoryManager.getEntityManager();
 
 	@Override
 	public List<Product> readAll() {
 		
-		List<Product> products = new ArrayList<>();
+		Query query = null;
 		
 		try {
 			
-			connection = ConnectionUtils.makeConnection();
-			preparedStatement = connection.prepareStatement(READ_ALL);
-			resultSet = preparedStatement.executeQuery();
+			query = em.createQuery("SELECT e FROM Product e");
 			
-			while(resultSet.next()) {
-				
-				Integer id = resultSet.getInt("id");
-				String name = resultSet.getString("name");
-				String description = resultSet.getString("description");
-				Double price = resultSet.getDouble("price");
-				
-				products.add(new Product(id, name, description, price));
-			}
-			
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
 		}
 		
-		return products;
+		return query.getResultList();
 	}
 
 	@Override
@@ -75,22 +71,10 @@ public class ProductDaoImpl implements ProductDao {
 		
 		try {
 			
-			connection = ConnectionUtils.makeConnection();
-			preparedStatement = connection.prepareStatement(READ);
-			preparedStatement.setInt(1, searchId);
-			resultSet = preparedStatement.executeQuery();
+			product = em.find(Product.class, searchId);
 			
-			while(resultSet.next()) {
 				
-				Integer id = resultSet.getInt("id");
-				String name = resultSet.getString("name");
-				String description = resultSet.getString("description");
-				Double price = resultSet.getDouble("price");
-				
-				product = new Product(id, name, description, price);
-			}
-			
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			LOGGER.error(e);
 		} finally {
 			closeConnection(connection, preparedStatement, resultSet);
@@ -103,13 +87,13 @@ public class ProductDaoImpl implements ProductDao {
 	public void save(Product product) {
 		
 		try {
-			connection = ConnectionUtils.makeConnection();
-			preparedStatement = connection.prepareStatement(SAVE);
-			preparedStatement.setString(1, product.getName());
-			preparedStatement.setString(2, product.getDescription());
-			preparedStatement.setDouble(3, product.getPrice());
-			preparedStatement.executeUpdate();
 			
+			em.getTransaction().begin();
+			
+			em.persist(product);
+			
+			em.getTransaction().commit();
+						
 		} catch (Exception e) {
 			LOGGER.error(e);
 		} finally {
@@ -122,10 +106,7 @@ public class ProductDaoImpl implements ProductDao {
 	public void delete(Integer id) {
 		
 		try {
-			connection = ConnectionUtils.makeConnection();
-			preparedStatement = connection.prepareStatement(DELETE);
-			preparedStatement.setInt(1, id);
-			preparedStatement.executeUpdate();
+			
 			
 		} catch (Exception e) {
 			LOGGER.error(e);
@@ -139,13 +120,7 @@ public class ProductDaoImpl implements ProductDao {
 	public void update(Product product) {
 
 		try {
-			connection = ConnectionUtils.makeConnection();
-			preparedStatement = connection.prepareStatement(UPDATE);
-			preparedStatement.setString(1, product.getName());
-			preparedStatement.setString(2, product.getDescription());
-			preparedStatement.setDouble(3, product.getPrice());
-			preparedStatement.setInt(4, product.getId());
-			preparedStatement.executeUpdate();
+			
 			
 		} catch (Exception e) {
 			LOGGER.error(e);
